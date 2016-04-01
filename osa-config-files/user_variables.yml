@@ -1,0 +1,15 @@
+---
+glance_default_store: swift
+neutron_l2_population: True
+tempest_public_subnet_cidr: 172.19.112.0/22
+nova_console_type: novnc
+nova_virt_type: ironic
+
+# Must be set to a normal MTU
+neutron_network_device_mtu: 1500
+
+# This URL is set so that a node, kicked by ironic, can have the agent talk back to the API
+ironic_openstack_api_url: "http://172.19.0.100:{{ ironic_service_port }}"
+
+# This URL is set so that a node, kicked by ironic, can access a swift temp URL
+ironic_swift_endpoint: "http://172.19.0.100:8080"

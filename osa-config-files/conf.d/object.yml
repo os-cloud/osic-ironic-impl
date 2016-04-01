@@ -1,0 +1,32 @@
+---
+global_overrides:
+  swift:
+    part_power: 8
+    storage_network: 'br-storage'
+    replication_network: 'br-storage'
+    drives:
+      - name: disk1
+      - name: disk2
+      - name: disk3
+      - name: disk4
+      - name: disk5
+      - name: disk6
+      - name: disk7
+      - name: disk8
+      - name: disk9
+      - name: disk10
+    mount_point: /srv/node
+    storage_policies:
+      - policy:
+          name: default
+          index: 0
+          default: True
+
+swift_hosts:
+  swift01:
+    ip: 172.19.100.28
+    container_vars:
+      swift_vars:
+        limit_container_types: swift
+        zone: 0
+        region: 1

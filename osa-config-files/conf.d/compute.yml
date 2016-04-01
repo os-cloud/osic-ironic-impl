@@ -1,0 +1,11 @@
+---
+compute_hosts:
+  controller01:
+    ip: 172.19.100.23
+# NOTE(cloudnull): Ironic can only have 1 compute node when
+#  using the nova compute manager. We can use the ironic
+#  cluster conf manager however that causes other issues.
+#  controller02:
+#    ip: 172.19.100.24
+#  controller03:
+#    ip: 172.19.100.25

@@ -1,0 +1,96 @@
+# VLAN TAGS
+# 430 - MANAGEMENT_NET - 172.19.100.0/22
+# 431 - STORAGE_NET    - 172.19.104.0/22
+# 432 - OVERLAY_NET    - 172.19.108.0/22
+# 433 - FLAT_NET       - 172.19.112.0/22
+
+auto p4p1
+iface p4p1 inet manual
+
+auto p1p2
+iface p1p2 inet manual
+    bond-master bond0
+    bond-primary p1p2
+
+auto p4p2
+iface p4p2 inet manual
+    bond-master bond0
+
+auto bond0
+iface bond0 inet manual
+    bond-slaves none
+    bond-mode active-backup
+    bond-miimon 100
+    bond-downdelay 200
+    bond-updelay 200
+
+auto p4p1.433
+iface p4p1.433 inet manual
+    vlan-raw-device p4p1
+
+iface bond0.430 inet manual
+    vlan-raw-device bond0
+
+iface bond0.431 inet manual
+    vlan-raw-device bond0
+
+iface bond0.432 inet manual
+    vlan-raw-device bond0
+
+auto br-pxe
+iface br-pxe inet static
+    bridge_stp off
+    bridge_waitport 10
+    bridge_fd 0
+    bridge_ports p1p1
+    address 172.19.1.{{ ansible_ssh_host.split('.')[-1] }}
+    netmask 255.255.252.0
+    offload-sg off
+
+auto br-flat
+iface br-flat inet static
+    bridge_stp off
+    bridge_waitport 10
+    bridge_fd 0
+    bridge_ports p4p1.433
+    address 172.19.112.{{ ansible_ssh_host.split('.')[-1] }}
+    netmask 255.255.252.0
+    offload-sg off
+
+auto br-mgmt
+iface br-mgmt inet static
+    bridge_stp off
+    bridge_waitport 10
+    bridge_fd 0
+    bridge_ports bond0.430
+    address 172.19.100.{{ ansible_ssh_host.split('.')[-1] }}
+    netmask 255.255.252.0
+    offload-sg off
+
+auto br-storage
+iface br-storage inet static
+    bridge_stp off
+    bridge_waitport 10
+    bridge_fd 0
+    bridge_ports bond0.431
+    address 172.19.104.{{ ansible_ssh_host.split('.')[-1] }}
+    netmask 255.255.252.0
+    offload-sg off
+
+auto br-vxlan
+iface br-vxlan inet static
+    bridge_stp off
+    bridge_waitport 10
+    bridge_fd 0
+    bridge_ports bond0.432
+    address 172.19.108.{{ ansible_ssh_host.split('.')[-1] }}
+    netmask 255.255.252.0
+    offload-sg off
+
+auto br-vlan
+iface br-vlan inet manual
+    bridge_stp off
+    bridge_waitport 10
+    bridge_fd 0
+    bridge_ports bond0
+    offload-sg off

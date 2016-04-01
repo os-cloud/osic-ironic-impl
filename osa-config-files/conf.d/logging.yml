@@ -1,0 +1,4 @@
+---
+log_hosts:
+  logging01:
+    ip: 172.19.100.26

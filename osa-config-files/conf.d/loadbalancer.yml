@@ -1,0 +1,4 @@
+---
+haproxy_hosts:
+  deploy01:
+    ip: 172.19.100.21
