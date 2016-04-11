@@ -13,3 +13,7 @@ ironic_openstack_api_url: "http://172.19.0.100:{{ ironic_service_port }}"
 
 # This URL is set so that a node, kicked by ironic, can access a swift temp URL
 ironic_swift_endpoint: "http://172.19.0.100:8080"
+
+neutron_dhcp_config:
+  dhcp-option-force: "26,1500"
+  log-facility: "/var/log/neutron/neutron-dnsmasq.log"
