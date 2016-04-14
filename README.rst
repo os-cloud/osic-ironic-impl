@@ -23,43 +23,44 @@ With the temporary virtual environment activated, distribute keys
 
 .. code-block:: bash
 
+    ssh-keygen
     SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
-    ansible all -i inventory-static-hosts.ini -m shell -a "echo ${SSH_KEY} | tee -a /root/.ssh/authorized_keys" --ask-pass
+    ansible os-control -i inventory-static-hosts.ini -m shell -a "echo ${SSH_KEY} | tee -a /root/.ssh/authorized_keys" --ask-pass
 
 
 With the temporary virtual environment activated, make sure all hosts have bridge-utils, ifenslave, and vlan installed
 
 .. code-block:: bash
 
-    ansible all -i inventory-static-hosts.ini -m shell -a 'apt-get update && apt-get install bridge-utils ifenslave vlan -y'
+    ansible os-control -i inventory-static-hosts.ini -m shell -a 'apt-get update && apt-get install bridge-utils ifenslave vlan -y'
 
 
 With the temporary virtual environment activated, deploy all of the network interface files for the cloud
 
 .. code-block:: bash
 
-    ansible all -i inventory-static-hosts.ini -m template -a 'src=templates/os-refimpl-devices.cfg.j2 dest=/etc/network/interfaces.d/os-refimpl-devices.cfg'
+    ansible os-control -i inventory-static-hosts.ini -m template -a 'src=templates/os-refimpl-devices.cfg.j2 dest=/etc/network/interfaces.d/os-refimpl-devices.cfg'
 
 
 With the temporary virtual environment activated, deploy the VIP addresses to your Loadbalancer host
 
 .. code-block:: bash
 
-    ansible deploy01 -i inventory-static-hosts.ini -m template -a 'src=templates/os-refimpl-floats.cfg.j2 dest=/etc/network/interfaces.d/os-refimpl-floats.cfg'
+    ansible deploy -i inventory-static-hosts.ini -m template -a 'src=templates/os-refimpl-floats.cfg.j2 dest=/etc/network/interfaces.d/os-refimpl-floats.cfg'
 
 
 With the temporary virtual environment activated, ensure extra interface files are parsed
 
 .. code-block:: bash
 
-    ansible all -i inventory-static-hosts.ini -m shell -a "if ! grep '^source /etc/network/interfaces.d/*.cfg'; then echo '\nsource /etc/network/interfaces.d/*.cfg' | tee -a /etc/network/interfaces; fi"
+    ansible os-control -i inventory-static-hosts.ini -m shell -a "if ! grep '^source /etc/network/interfaces.d/*.cfg'; then echo '\nsource /etc/network/interfaces.d/*.cfg' | tee -a /etc/network/interfaces; fi"
 
 
 With the temporary virtual environment activated, bring all of the extra interfaces online
 
 .. code-block:: bash
 
-    ansible all -i inventory-static-hosts.ini -m shell -a "for i in \$(awk '/iface/ {print \$2}' /etc/network/interfaces.d/os-refimpl-devices.cfg); do ifup \$i; done"
+    ansible os-control -i inventory-static-hosts.ini -m shell -a "for i in \$(awk '/iface/ {print \$2}' /etc/network/interfaces.d/os-refimpl-devices.cfg); do ifup \$i; done"
 
 
 With all that complete deactivate the venv
