@@ -1,0 +1,28 @@
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto p1p1
+iface p1p1 inet manual
+
+# Container Bridge
+auto br-pxe
+iface br-pxe inet static
+    address 172.19.0.{{ ansible_ssh_host.split('.')[-1] }}
+    netmask 255.255.252.0
+    gateway 172.19.0.1
+    dns-nameservers 8.8.8.8 8.8.4.4
+    bridge_ports p1p1
+    bridge_stp off
+    bridge_waitport 0
+    bridge_fd 0
+    # Create a br-pxe veth pair to use on the tftp network
+    #  This is only required on a device constrained environment
+    #  In normal deployment situations this veth would not exist and
+    #  would be replaced by an actual network.
+    pre-up ip link add br-pxe-veth type veth peer name br-pxe-eth || true
+    pre-up ip link set br-pxe-veth up || true
+    pre-up ip link set br-pxe-eth up || true
+    post-down ip link del br-pxe-veth || true
+
+source /etc/network/interfaces.d/*.cfg

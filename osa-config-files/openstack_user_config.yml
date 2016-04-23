@@ -8,7 +8,7 @@ cidr_networks:
   container: 172.19.100.0/22
   tunnel: 172.19.108.0/22
   storage: 172.19.104.0/22
-  cleaning: 172.19.0.0/22
+  tftp: 172.19.0.0/22
 
 used_ips:
   - "172.19.100.0,172.19.100.200"
@@ -45,20 +45,20 @@ global_overrides:
         group_binds:
           - neutron_linuxbridge_agent
     - network:
-        container_bridge: "br-pxe"
+        container_bridge: "br-tftp"
         container_type: "veth"
         container_interface: "eth13"
         type: "flat"
-        net_name: "cleaning"
+        net_name: "tftp"
         group_binds:
           - neutron_linuxbridge_agent
     - network:
-        container_bridge: "br-pxe"
+        container_bridge: "br-tftp"
         container_type: "veth"
         container_interface: "eth13"
         type: "flat"
-        net_name: "cleaning"
-        ip_from_q: "cleaning"
+        net_name: "tftp"
+        ip_from_q: "tftp"
         group_binds:
           - ironic_conductor
     - network:

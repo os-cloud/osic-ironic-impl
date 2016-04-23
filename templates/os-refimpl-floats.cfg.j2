@@ -1,13 +1,7 @@
 # pxe address alias from original basic config
 auto br-pxe
 iface br-pxe inet static
-    address 172.19.0.21
-    netmask 255.255.252.0
-
-# Basic flat network gatewaym this is used by neutron
-auto br-flat
-iface br-flat inet static
-    address 172.19.112.1
+    address 172.19.1.21
     netmask 255.255.252.0
 
 # Vip for the pxe network to be able to speak back to the API services

@@ -35,6 +35,13 @@ With the temporary virtual environment activated, make sure all hosts have bridg
     ansible os-control -i inventory-static-hosts.ini -m shell -a 'apt-get update && apt-get install bridge-utils ifenslave vlan -y'
 
 
+With the temporary virtual environment activated, deploy the base network configuration file
+
+.. code-block:: bash
+
+    ansible deploy -i inventory-static-hosts.ini -m template -a 'src=templates/base-interfaces.cfg.j2 dest=/etc/network/interfaces'
+
+
 With the temporary virtual environment activated, deploy all of the network interface files for the cloud
 
 .. code-block:: bash
@@ -143,7 +150,7 @@ In the complex case, this can be whatever you need and want just make sure you a
 
     neutron net-create cleaning-net --shared \
                                     --provider:network_type flat \
-                                    --provider:physical_network ironic-net
+                                    --provider:physical_network tftp
 
     neutron subnet-create ironic-net 172.19.0.0/22 --name ironic-subnet
                                                    --ip-version=4 \

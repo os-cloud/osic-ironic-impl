@@ -37,25 +37,18 @@ iface bond0.431 inet manual
 iface bond0.432 inet manual
     vlan-raw-device bond0
 
-auto br-pxe
-iface br-pxe inet static
+auto br-tftp
+iface br-tftp inet static
     bridge_stp off
     bridge_waitport 10
     bridge_fd 0
-    bridge_ports p1p1
+    # Plugin the br-pxe veth pair to wire the tftp network
+    #  This is only required on a device constrained environment
+    #  In normal deployment situations this veth would not exist and
+    #  would be replaced by an actual network.
+    bridge_ports br-pxe-eth
     address 172.19.1.{{ ansible_ssh_host.split('.')[-1] }}
     netmask 255.255.252.0
-    offload-sg off
-
-auto br-flat
-iface br-flat inet static
-    bridge_stp off
-    bridge_waitport 10
-    bridge_fd 0
-    bridge_ports p4p1.433
-    address 172.19.112.{{ ansible_ssh_host.split('.')[-1] }}
-    netmask 255.255.252.0
-    offload-sg off
 
 auto br-mgmt
 iface br-mgmt inet static
