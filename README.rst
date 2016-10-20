@@ -148,11 +148,11 @@ In the complex case, this can be whatever you need and want just make sure you a
 
 .. code-block:: bash
 
-    neutron net-create cleaning-net --shared \
+    neutron net-create ironic-net --shared \
                                     --provider:network_type flat \
                                     --provider:physical_network tftp
 
-    neutron subnet-create ironic-net 172.19.0.0/22 --name ironic-subnet
+    neutron subnet-create ironic-net 172.19.0.0/22 --name ironic-subnet \
                                                    --ip-version=4 \
                                                    --allocation-pool start=172.19.1.100,end=172.19.1.200 \
                                                    --enable-dhcp \
