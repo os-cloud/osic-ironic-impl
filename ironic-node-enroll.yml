@@ -1,10 +1,13 @@
+# This playbook will require the following variables
+#    utility_address: This is the IP address of a utility node
+#    deploy_ramdisk: This is the ramdisk image name created with DIB as found in glance
+#    deploy_kernel: This is the kernel image name created with DIB as found in glance
+#    ironic_deploy_image_name: Name of the user image assosiated with a given node
+
 - name: Setup the utility location(s)
   hosts: ilo-ironic-nodes
   user: root
   gather_facts: false
-  vars:
-    utility_address: 172.19.102.222
-    ironic_deploy_image_name: ironic-deploy
   tasks:
     - name: create ironic nodes
       shell: |
@@ -15,8 +18,8 @@
               -i ipmi_address="{{ ilo_address }}" \
               -i ipmi_password="{{ ilo_password }}" \
               -i ipmi_username="{{ ilo_user }}" \
-              -i deploy_ramdisk="${DEPLOYRAMDISK}" \
-              -i deploy_kernel="${DEPLOYKERNEL}" \
+              -i deploy_ramdisk="{{ deploy_ramdisk }}" \
+              -i deploy_kernel="{{ deploy_kernel }}" \
               -n {{ inventory_hostname }}
         fi
       delegate_to: "{{ utility_address }}"
