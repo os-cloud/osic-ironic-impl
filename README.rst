@@ -250,8 +250,18 @@ Run the node enroll playbook
 .. code-block:: bash
 
     cd /opt/osic-ironic-impl
-    openstack-ansible -i /opt/osic-ironic-impl/inventory-static-hosts.ini ironic-node-enroll.yml -e "ilo_password=$ILO_PASSWORD"
 
+    export ILO_PASSWORD=secrete
+    export DEPLOY_INITRAMFS_ID=UUID_FROM_GLANCE_HERE
+    export DEPLOY_KERNEL_ID=UUID_FROM_GLANCE_HERE
+
+    openstack-ansible -i /opt/osic-ironic-impl/inventory-static-hosts.ini \
+                      -e "ilo_password=$ILO_PASSWORD" \
+                      -e utility_address=172.19.103.38 \
+                      -e deploy_ramdisk=${DEPLOY_INITRAMFS_ID} \
+                      -e deploy_kernel=${DEPLOY_KERNEL_ID} \
+                      -e ironic_deploy_image_name=ubuntu-user-image
+                      ironic-node-enroll.yml
 
 Deploy a baremetal node kicked with ironic
 ------------------------------------------
