@@ -208,25 +208,37 @@ Upload the created deploy images into glance
     glance image-create --name ironic-deploy.initramfs --visibility public --disk-format ari --container-format ari < ironic-deploy.initramfs
 
 
-Create Ubuntu user image
+Create a user image and upload the created user images into glance.
 
 .. code-block:: bash
 
-    disk-image-create ubuntu baremetal dhcp-all-interfaces grub2 -o ubuntu-user-image
+    # Set the release
+    export DIB_RELEASE=xenial
+    export DISTRO_NAME=ubuntu
 
-
-Upload the created user images into glance
-
-.. code-block:: bash
+    # Create the image
+    DIB_CLOUD_INIT_DATASOURCES="Ec2, ConfigDrive, OpenStack" disk-image-create -o baremetal-$DISTRO_NAME-$DIB_RELEASE $DISTRO_NAME baremetal dhcp-all-interfaces grub2
 
     # Upload the user image vmlinuz and store uuid
-    VMLINUZ_UUID="$(glance image-create --name ubuntu-user-image.vmlinuz --visibility public --disk-format aki --container-format aki  < ubuntu-user-image.vmlinuz | awk '/\| id/ {print $4}')"
+    VMLINUZ_UUID="$(glance image-create --name baremetal-$DISTRO_NAME-$DIB_RELEASE.vmlinuz \
+                                        --visibility public \
+                                        --disk-format aki \
+                                        --container-format aki < baremetal-$DISTRO_NAME-$DIB_RELEASE.vmlinuz | awk '/\| id/ {print $4}')"
 
     # Upload the user image initrd and store uuid
-    INITRD_UUID="$(glance image-create --name ubuntu-user-image.initrd --visibility public --disk-format ari --container-format ari  < ubuntu-user-image.initrd | awk '/\| id/ {print $4}')"
+    INITRD_UUID="$(glance image-create --name baremetal-$DISTRO_NAME-$DIB_RELEASE.initrd \
+                                       --visibility public \
+                                       --disk-format ari \
+                                       --container-format ari < baremetal-$DISTRO_NAME-$DIB_RELEASE.initrd | awk '/\| id/ {print $4}')"
 
     # Create image
-    glance image-create --name ubuntu-user-image --visibility public --disk-format qcow2 --container-format bare --property kernel_id=${VMLINUZ_UUID} --property ramdisk_id=${INITRD_UUID} < ubuntu-user-image.qcow2
+    glance image-create --name baremetal-$DISTRO_NAME-$DIB_RELEASE \
+                        --visibility public \
+                        --disk-format qcow2 \
+                        --container-format bare \
+                        --property kernel_id=${VMLINUZ_UUID} \
+                        --property ramdisk_id=${INITRD_UUID} < baremetal-$DISTRO_NAME-$DIB_RELEASE.qcow2
+
 
 
 Creating an Ionic flavor
