@@ -142,8 +142,7 @@ Run the deployment
 Setup a neutron network for use Ironic
 --------------------------------------
 
-In the general case, the neutron network can be a simple flat network.
-In the complex case, this can be whatever you need and want just make sure you adjust the deployment accordingly.
+In the general case, the neutron network can be a simple flat network. In the complex case, this can be whatever you need and want just make sure you adjust the deployment accordingly.
 
 
 .. code-block:: bash
@@ -190,22 +189,28 @@ kernel. For this reason the LTS kernel package install is absolutely required.
     echo 'linux-image-generic-lts-xenial:' > /usr/local/share/diskimage-builder/elements/ubuntu/package-installs.yaml
 
 
-Create Ubuntu ramdisk
+Create Ubuntu deploy images and upload them into glance
 
 .. code-block:: bash
 
+    # Create the deploy image and initramfs
     disk-image-create ironic-agent ubuntu -o ironic-deploy
 
-
-Upload the created deploy images into glance
-
-.. code-block:: bash
-
     # Upload the deploy image kernel
-    glance image-create --name ironic-deploy.kernel --visibility public --disk-format aki --container-format aki < ironic-deploy.kernel
+    glance image-create --name ironic-deploy.kernel \
+                        --visibility public \
+                        --disk-format aki \
+                        --property hypervisor_type=baremetal \
+                        --protected=True \
+                        --container-format aki < ironic-deploy.kernel
 
     # Upload the user image initramfs
-    glance image-create --name ironic-deploy.initramfs --visibility public --disk-format ari --container-format ari < ironic-deploy.initramfs
+    glance image-create --name ironic-deploy.initramfs \
+                        --visibility public \
+                        --disk-format ari \
+                        --property hypervisor_type=baremetal \
+                        --protected=True \
+                        --container-format ari < ironic-deploy.initramfs
 
 
 Create a user image and upload the created user images into glance.
@@ -217,18 +222,22 @@ Create a user image and upload the created user images into glance.
     export DISTRO_NAME=ubuntu
 
     # Create the image
-    DIB_CLOUD_INIT_DATASOURCES="Ec2, ConfigDrive, OpenStack" disk-image-create -o baremetal-$DISTRO_NAME-$DIB_RELEASE $DISTRO_NAME baremetal dhcp-all-interfaces grub2
+    DIB_CLOUD_INIT_DATASOURCES="Ec2, ConfigDrive, OpenStack" disk-image-create -o baremetal-$DISTRO_NAME-$DIB_RELEASE $DISTRO_NAME baremetal dhcp-all-interfaces bootloader
 
     # Upload the user image vmlinuz and store uuid
     VMLINUZ_UUID="$(glance image-create --name baremetal-$DISTRO_NAME-$DIB_RELEASE.vmlinuz \
                                         --visibility public \
                                         --disk-format aki \
+                                        --property hypervisor_type=baremetal \
+                                        --protected=True \
                                         --container-format aki < baremetal-$DISTRO_NAME-$DIB_RELEASE.vmlinuz | awk '/\| id/ {print $4}')"
 
     # Upload the user image initrd and store uuid
     INITRD_UUID="$(glance image-create --name baremetal-$DISTRO_NAME-$DIB_RELEASE.initrd \
                                        --visibility public \
                                        --disk-format ari \
+                                       --property hypervisor_type=baremetal \
+                                       --protected=True \
                                        --container-format ari < baremetal-$DISTRO_NAME-$DIB_RELEASE.initrd | awk '/\| id/ {print $4}')"
 
     # Create image
@@ -236,7 +245,9 @@ Create a user image and upload the created user images into glance.
                         --visibility public \
                         --disk-format qcow2 \
                         --container-format bare \
+                        --property hypervisor_type=baremetal \
                         --property kernel_id=${VMLINUZ_UUID} \
+                        --protected=True \
                         --property ramdisk_id=${INITRD_UUID} < baremetal-$DISTRO_NAME-$DIB_RELEASE.qcow2
 
 
